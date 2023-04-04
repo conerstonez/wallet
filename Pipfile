@@ -11,6 +11,10 @@ djangorestframework = "*"
 decouple = "*"
 config = "*"
 python-decouple = "*"
+django-debug-toolbar = "*"
+pillow = "*"
+djoser = "*"
+self = "*"
 
 [dev-packages]
 
