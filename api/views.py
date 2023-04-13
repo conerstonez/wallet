@@ -3,6 +3,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from api.serializers import WalletUserSerializer
 from wallet_app.models import WalletUser
+# from djmoney.money import Money
 
 
 # Create your views here.

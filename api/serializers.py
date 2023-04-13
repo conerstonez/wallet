@@ -1,6 +1,5 @@
-# from rest_framework import serializers
 from rest_framework import serializers
-from djmoney.contrib.django_rest_framework import MoneyField
+# from djmoney.contrib.django_rest_framework import MoneyField
 
 from wallet_app.models import *
 
@@ -20,7 +19,7 @@ class WalletUserSerializer(serializers.ModelSerializer):
 class WalletSerializer(serializers.ModelSerializer):
     class Meta:
         model = Wallet
-        fields = '__all__'
+        fields = ['wallet_number', 'balance']
 
     @staticmethod
     def create_new_ref_number(self, wallet: Wallet):
@@ -62,4 +61,4 @@ class AccountSerializer(serializers.ModelSerializer):
 class CardSerializer(serializers.ModelSerializer):
     class Meta:
         model = DebitCard
-        fields = '__all__'
+        fields = ['card_number', 'card_holder_name']

@@ -5,6 +5,8 @@ from uuid import uuid4
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import CASCADE
+from djmoney.models.validators import MinMoneyValidator, MaxMoneyValidator
+from djmoney.money import Money
 
 from phonenumber_field.modelfields import PhoneNumberField
 from djmoney.models.fields import MoneyField
@@ -38,7 +40,8 @@ class Transaction(models.Model):
     transaction_status = models.CharField(choices=TransactionStatus.choices, max_length=15, default=None)
     transaction_time = models.DateTimeField(auto_now_add=True)
     description = models.TextField()
-    amount = MoneyField(max_digits=15, decimal_places=4)
+    amount = MoneyField(max_digits=15, decimal_places=4,
+                        validators=[MinMoneyValidator(Money(0, 'NGN')), MaxMoneyValidator(Money(50000, 'NGN'))])
 
     def __str__(self):
         return '%s %s %s' % (self.transaction_type, self.transaction_status, self.amount)
@@ -56,11 +59,11 @@ class Saving(models.Model):
         QUARTERLY = 'Quarterly'
 
     title = models.CharField(max_length=150)
-    amount = MoneyField(decimal_places=4, max_digits=15)
+    amount = MoneyField(decimal_places=4, max_digits=15, validators=[MinMoneyValidator(Money(0, 'NGN'))])
     saving_plan = models.CharField(choices=SavingPlan.choices, default=None, max_length=15)
     start_date = models.DateField(auto_now_add=True)
     end_date = models.DateField(auto_now=True, blank=True, null=True)
-    balance = models.DecimalField(decimal_places=2, max_digits=15, default=0.0)
+    balance = MoneyField(decimal_places=4, max_digits=15, validators=[MinMoneyValidator(Money(0, 'NGN'))])
 
     def __str__(self):
         return self.title
@@ -79,7 +82,7 @@ class DebitCard(models.Model):
 
 class Wallet(models.Model):
     wallet_number = models.CharField(max_length=10, editable=False, unique=True)
-    balance = MoneyField(max_digits=19, decimal_places=4, default=0.0)
+    balance = MoneyField(max_digits=19, decimal_places=4, validators=[MinMoneyValidator(Money(0, 'NGN'))])
     wallet_user = models.OneToOneField('WalletUser', on_delete=CASCADE, related_name='user')
     saving = models.ForeignKey(Saving, on_delete=models.SET_NULL, related_name='savings',
                                default=None, null=True)
