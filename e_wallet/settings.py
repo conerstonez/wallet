@@ -9,8 +9,13 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
+import os
 from datetime import timedelta
 from pathlib import Path
+
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -29,6 +34,17 @@ ALLOWED_HOSTS = [
 
 ]
 
+# cloudinary.Config(
+#     cloud_name =  config('CLOUD_NAME'),
+#     api_key = config('CLOUD_API_KEY'),
+#     api_secret = config('CLOUD_API_SECRET'),
+# )
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': config('CLOUD_NAME'),
+    'CLOUD_API_KEY': config('CLOUD_API_KEY'),
+    'CLOUD_API_SECRET': config('CLOUD_API_SECRET'),
+}
 
 INTERNAL_IPS = [
     config('INTERNAL_IPS'),
@@ -55,6 +71,10 @@ THIRD_PARTY_APPS = [
     'debug_toolbar',
     'rest_framework',
     'djoser',
+    'cloudinary',
+    'phonenumber_field',
+    'djmoney',
+    'djmoney.contrib.exchange',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -96,7 +116,18 @@ DJOSER = {
     }
 }
 
+
 AUTH_USER_MODEL = 'wallet_app.AppUser'
+
+
+PHONENUMBER_DB_FORMAT = 'INTERNATIONAL'
+PHONENUMBER_DEFAULT_FORMAT = 'INTERNATIONAL'
+PHONENUMBER_DEFAULT_REGION = None
+
+
+EXCHANGE_BACKEND = 'djmoney.contrib.exchange.backends.FixerBackend'
+CURRENCIES = ['NGN', 'USD', 'EUR', 'GBP']
+DEFAULT_CURRENCY = 'NGN'
 
 
 ROOT_URLCONF = 'e_wallet.urls'
@@ -165,19 +196,25 @@ USE_I18N = True
 
 USE_TZ = True
 
+USE_L10N = True
+
+USE_I18N_STANDARD = True
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
 
-AUTH_USER_MODEL = 'wallet_app.WalletUser'
-
-# MEDIA_URL = ''
-
 # STATICFILES_DIRS = []
 
-# MEDIA_ROOT = ''
+AUTH_USER_MODEL = 'wallet_app.WalletUser'
+
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field

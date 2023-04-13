@@ -1,2 +1,4 @@
 /e_wallet/.env
 .gitignore
+/wallet_app/migrations/
+/api/migrations/

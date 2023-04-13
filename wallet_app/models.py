@@ -1,9 +1,15 @@
 from enum import Enum
 from uuid import uuid4
 
+# from cloudinary.models import CloudinaryField
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import CASCADE
+
+from phonenumber_field.modelfields import PhoneNumberField
+from djmoney.models.fields import MoneyField
+
+import random
 
 
 class Account(models.Model):
@@ -32,7 +38,7 @@ class Transaction(models.Model):
     transaction_status = models.CharField(choices=TransactionStatus.choices, max_length=15, default=None)
     transaction_time = models.DateTimeField(auto_now_add=True)
     description = models.TextField()
-    amount = models.DecimalField(max_digits=15, decimal_places=2)
+    amount = MoneyField(max_digits=15, decimal_places=4)
 
     def __str__(self):
         return '%s %s %s' % (self.transaction_type, self.transaction_status, self.amount)
@@ -50,7 +56,7 @@ class Saving(models.Model):
         QUARTERLY = 'Quarterly'
 
     title = models.CharField(max_length=150)
-    amount = models.DecimalField(decimal_places=2, max_digits=15)
+    amount = MoneyField(decimal_places=4, max_digits=15)
     saving_plan = models.CharField(choices=SavingPlan.choices, default=None, max_length=15)
     start_date = models.DateField(auto_now_add=True)
     end_date = models.DateField(auto_now=True, blank=True, null=True)
@@ -72,8 +78,9 @@ class DebitCard(models.Model):
 
 
 class Wallet(models.Model):
-    balance = models.DecimalField(max_digits=25, decimal_places=2, default=0.0)
-    wallet_user = models.ForeignKey('WalletUser', on_delete=CASCADE, related_name='user')
+    wallet_number = models.CharField(max_length=10, editable=False, unique=True)
+    balance = MoneyField(max_digits=19, decimal_places=4, default=0.0)
+    wallet_user = models.OneToOneField('WalletUser', on_delete=CASCADE, related_name='user')
     saving = models.ForeignKey(Saving, on_delete=models.SET_NULL, related_name='savings',
                                default=None, null=True)
     transaction = models.ForeignKey(Transaction, on_delete=models.SET_NULL, related_name='transactions',
@@ -98,18 +105,18 @@ class NextOfKin(models.Model):
 
 class WalletUser(AbstractUser):
     email = models.EmailField(max_length=150, unique=True)
-    phone_number = models.CharField(max_length=11)
+    phone_number = PhoneNumberField(unique=True)
     address = models.TextField()
     next_of_kin = models.ForeignKey(NextOfKin, blank=True, null=True,
                                     on_delete=models.SET_NULL, related_name="next_of_kin")
     BVN = models.CharField(max_length=11)
     NIN = models.CharField(max_length=10)
-    display_photo = models.ImageField()
+    display_photo = models.ImageField(upload_to='media/images/')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['username', 'password']
 
     def __str__(self):
         return self.get_full_name()

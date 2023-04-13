@@ -15,6 +15,9 @@ django-debug-toolbar = "*"
 pillow = "*"
 djoser = "*"
 self = "*"
+cloudinary = "*"
+dj3-cloudinary-storage = "*"
+django-money = {extras = ["exchange"], version = "*"}
 
 [dev-packages]
 
