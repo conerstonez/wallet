@@ -4,7 +4,7 @@ from wallet_app.models import *
 
 @admin.register(WalletUser)
 class UserAdmin(admin.ModelAdmin):
-    # list_display = ['full_name' ]
+    list_display = ['username', 'email', 'first_name', 'last_name', 'is_staff', 'date_joined', 'updated_at', 'display_photo']
     # list_filter = ['title']
     # list_per_page = 10
     # list_editable = []

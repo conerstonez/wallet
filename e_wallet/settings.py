@@ -40,11 +40,6 @@ ALLOWED_HOSTS = [
 #     api_secret = config('CLOUD_API_SECRET'),
 # )
 
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': config('CLOUD_NAME'),
-    'CLOUD_API_KEY': config('CLOUD_API_KEY'),
-    'CLOUD_API_SECRET': config('CLOUD_API_SECRET'),
-}
 
 INTERNAL_IPS = [
     config('INTERNAL_IPS'),
@@ -210,9 +205,15 @@ STATIC_URL = 'static/'
 
 AUTH_USER_MODEL = 'wallet_app.WalletUser'
 
-MEDIA_URL = '/media/'
+MEDIA_URL = '/wallet_media/'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'wallet_media')
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': config('CLOUD_NAME'),
+    'API_KEY': config('CLOUD_API_KEY'),
+    'API_SECRET': config('CLOUD_API_SECRET'),
+}
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 

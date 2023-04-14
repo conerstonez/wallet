@@ -5,13 +5,15 @@ from uuid import uuid4
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import CASCADE
+
 from djmoney.models.validators import MinMoneyValidator, MaxMoneyValidator
 from djmoney.money import Money
-
 from phonenumber_field.modelfields import PhoneNumberField
 from djmoney.models.fields import MoneyField
 
 import random
+
+from wallet_app.utils import create_new_ref_number
 
 
 class Account(models.Model):
@@ -81,14 +83,19 @@ class DebitCard(models.Model):
 
 
 class Wallet(models.Model):
-    wallet_number = models.CharField(max_length=10, editable=False, unique=True)
-    balance = MoneyField(max_digits=19, decimal_places=4, validators=[MinMoneyValidator(Money(0, 'NGN'))])
-    wallet_user = models.OneToOneField('WalletUser', on_delete=CASCADE, related_name='user')
+    wallet_number = models.CharField(max_length=10,
+                                     editable=False,
+                                     unique=True,
+                                     default=create_new_ref_number)
+    balance = MoneyField(max_digits=19, decimal_places=4,
+                         validators=[MinMoneyValidator(Money(0, 'NGN'))], default=0.0)
+    wallet_user = models.OneToOneField('WalletUser', on_delete=models.CASCADE, related_name='user')
     saving = models.ForeignKey(Saving, on_delete=models.SET_NULL, related_name='savings',
-                               default=None, null=True)
+                               default=None, blank=True, null=True,)
     transaction = models.ForeignKey(Transaction, on_delete=models.SET_NULL, related_name='transactions',
-                                    default=None, null=True)
-    card = models.ForeignKey(DebitCard, on_delete=models.PROTECT, related_name='cards', default=None)
+                                    default=None, blank=True, null=True,)
+    card = models.ForeignKey(DebitCard, on_delete=models.PROTECT, related_name='cards',
+                             default=None, blank=True, null=True,)
 
     def __str__(self):
         return '%s %s' % (self.wallet_user_id, self.balance)
@@ -109,12 +116,12 @@ class NextOfKin(models.Model):
 class WalletUser(AbstractUser):
     email = models.EmailField(max_length=150, unique=True)
     phone_number = PhoneNumberField(unique=True)
-    address = models.TextField()
+    address = models.TextField(blank=True, null=True,)
     next_of_kin = models.ForeignKey(NextOfKin, blank=True, null=True,
                                     on_delete=models.SET_NULL, related_name="next_of_kin")
-    BVN = models.CharField(max_length=11)
-    NIN = models.CharField(max_length=10)
-    display_photo = models.ImageField(upload_to='media/images/')
+    BVN = models.CharField(max_length=11, blank=True, null=True,)
+    NIN = models.CharField(max_length=10, blank=True, null=True,)
+    display_photo = models.ImageField(upload_to='images', blank=True, null=True,)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
